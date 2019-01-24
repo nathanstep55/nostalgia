@@ -216,6 +216,7 @@ public class SongManager : MonoBehaviour
 
 			long time = long.Parse(dataPoints[2]);
 			int x = int.Parse(dataPoints[0]) * 3 / 64;
+			//Debug.Log(x);
 			
 			// if hitobject == note
 			if (dataPoints[5] == "0:0:0:0:")

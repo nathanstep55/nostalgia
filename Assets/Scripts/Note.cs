@@ -61,6 +61,9 @@ public class Note : MonoBehaviour
   {
     long offset = tapTime - time;
 
+    if (Mathf.Abs(offset) > 50)
+      return;
+
 		gm.ui.offsetText.text = offset.ToString();
 
 		gm.noteManager.offsetHistory.Insert(0, offset);
