@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using MidiJack;
 using UnityEngine;
 
 public class InputManager : MonoBehaviour
@@ -18,6 +19,10 @@ public class InputManager : MonoBehaviour
       {KeyCode.P, 9}
   };
 
+  public bool midimode = true;
+  public MidiChannel midichannel = MidiChannel.Ch1;
+  public int[] midikeyrange = {24, 72};
+
   public int startwindow = -1;
   public int endwindow = 2;
   
@@ -31,10 +36,22 @@ public class InputManager : MonoBehaviour
     if (!gm.audioManager.source.isPlaying)
       return;
     
-    foreach (KeyCode key in keydict.Keys)
+    if (!midimode)
+      foreach (KeyCode key in keydict.Keys)
+        if (Input.GetKeyDown(key))
+        {
+          Tap(keydict[key]);
+          //Light(keydict[key]);
+        }
+
+    else
     {
-      if (Input.GetKeyDown(key))
-        Tap(keydict[key]);
+      for (int i = midikeyrange[0]; i <= midikeyrange[1]; i++)
+        if (MidiMaster.GetKeyDown(midichannel, i))
+        {
+          Tap(i-midikeyrange[0]);
+          //Light(i-startwindow);
+        }
     }
       
 	}
@@ -47,8 +64,18 @@ public class InputManager : MonoBehaviour
     {
       // Debug.Log(n.x);
       // Debug.Log((double)x / (double)(keydict.Count-1) * 24.0);
-      if (n.x >= (double)(x+startwindow) / (double)(keydict.Count-1) * 24.0 && n.x < (double)(x+endwindow) / (double)(keydict.Count-1) * 24.0)
+      if (!midimode)
+      {
+        if (n.x >= (double)(x+startwindow) / (double)(keydict.Count-1) * 24.0 && n.x < (double)(x+endwindow) / (double)(keydict.Count-1) * 24.0)
+          n.Tap(gm.audioManager.position);
+      }
+      else if (n.x >= (double)(x+startwindow) / (double)(midikeyrange[1]-midikeyrange[0]-1) * 24.0 && n.x < (double)(x+endwindow) / (double)(midikeyrange[1]-midikeyrange[0]-1) * 24.0)
         n.Tap(gm.audioManager.position);
     }
+  }
+  void Light(int x)
+  {
+    return;
+    //setLight((double)(x+startwindow) / (double)(keydict.Count-1) * 24.0, (double)(x+endwindow) / (double)(keydict.Count-1) * 24.0)
   }
 }
